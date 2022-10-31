@@ -31,7 +31,7 @@ namespace PWEB_P6.Data.Migrations
                     .IsConcurrencyToken()
                     .HasColumnType("nvarchar(max)");
 
-                b.Property<string>("Name")
+                b.Property<string>("Nome")
                     .HasMaxLength(256)
                     .HasColumnType("nvarchar(256)");
 
@@ -212,14 +212,14 @@ namespace PWEB_P6.Data.Migrations
                     .HasMaxLength(128)
                     .HasColumnType("nvarchar(128)");
 
-                b.Property<string>("Name")
+                b.Property<string>("Nome")
                     .HasMaxLength(128)
                     .HasColumnType("nvarchar(128)");
 
                 b.Property<string>("Value")
                     .HasColumnType("nvarchar(max)");
 
-                b.HasKey("UserId", "LoginProvider", "Name");
+                b.HasKey("UserId", "LoginProvider", "Nome");
 
                 b.ToTable("AspNetUserTokens", (string)null);
             });
@@ -250,7 +250,7 @@ namespace PWEB_P6.Data.Migrations
                 b.Property<int>("IdadeMinima")
                     .HasColumnType("int");
 
-                b.Property<string>("Name")
+                b.Property<string>("Nome")
                     .IsRequired()
                     .HasColumnType("nvarchar(max)");
 

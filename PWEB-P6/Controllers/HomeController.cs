@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PWEB_P6.Data;
 using PWEB_P6.Models;
 using System.Diagnostics;
 
@@ -7,15 +8,17 @@ namespace PWEB_P6.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
         {
-            return View();
+            return View(_context.Cursos.Where(c => c.Disponivel).ToList());
         }
 
         public IActionResult Privacy()
