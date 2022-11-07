@@ -1,31 +1,44 @@
-﻿@model IEnumerable<PWEB_P6.Models.Curso>
+﻿@model PWEB_P6.ViewModels.PesquisaCursoViewModel
 
 @{
     Layout = "~/Views/Shared/_Layout2.cshtml";
 }
 
-<h1>@ViewData["Title"] <small>(<a asp-action="Create">Adicionar Curso</a>)</small></h1>
+<h1>
+    @ViewData["Title"]
+    <small>(<a asp-action="Create">adicionar</a>)</small>
+</h1>
 
-<form method="get">
-    Pesquisa:
-    <input type="text" id="TextoAPesquisar" name="TextoAPesquisar">
-    <input type="submit" value="Pesquisar" />
-</form>
+<div class="row">
+    <div class="col-2">
+        <a asp-action="Index" asp-controller="Cursos" asp-route-disponivel="">Todos</a> |
+        <a asp-action="Index" asp-route-disponivel="true">Activos</a> |
+        <a asp-action="Index" asp-route-disponivel="false">Inactivos</a> |
+    </div>
+    <div class="col-5">
+        <form method="post">
+            <label asp-for="TextoAPesquisar"></label>
+            <input asp-for="TextoAPesquisar">
+            <input type="submit" value="Pesquisar" />
+        </form>
+    </div>
+</div>
 
-<a asp-action="Index" asp-controller="Cursos" asp-route-disponivel="">Todos</a> |
-<a asp-action="Index" asp-route-disponivel="true">Activos</a> |
-<a asp-action="Index" asp-route-disponivel="false">Inactivos</a>
+<p>Existe(m) @Model.NumResultados curso(s)</p>
 
 <table class="table table-bordered table-striped table-hover">
     <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Disponivel)
-            </th>
-            @*
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ListaDeCursos.FirstOrDefault().Categoria)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ListaDeCursos.FirstOrDefault().Nome)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ListaDeCursos.FirstOrDefault().Disponivel)
+        </th>
+        @*
             <th>
                 @Html.DisplayNomeFor(model => model.Categoria)
             </th>
@@ -42,19 +55,22 @@
                 @Html.DisplayNomeFor(model => model.IdadeMinima)
             </th>
             *@
-            <th></th>
-        </tr>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Disponivel)
-            </td>
-            @*
+@foreach (var item in Model.ListaDeCursos) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Categoria.Nome)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Nome)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Disponivel)
+        </td>
+        @*
             <td>
                 @Html.DisplayFor(modelItem => item.Categoria)
             </td>
@@ -71,12 +87,12 @@
                 @Html.DisplayFor(modelItem => item.IdadeMinima)
             </td>
             *@
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Apagar</a>
-            </td>
-        </tr>
+        <td>
+            <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+            <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
+            <a asp-action="Delete" asp-route-id="@item.Id">Apagar</a>
+        </td>
+    </tr>
 }
     </tbody>
 </table>
