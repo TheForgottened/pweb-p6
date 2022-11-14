@@ -50,13 +50,14 @@ namespace PWEB_P6.Controllers
                 (c.Nome.Contains(TextoAPesquisar) || c.Descricao.Contains(TextoAPesquisar)) && c.CategoriaId == CategoriaId).ToListAsync());
         }
 
-        public async Task<IActionResult> Search(string? TextoAPesquisar)
+        public async Task<IActionResult> Search(string? textoAPesquisar)
         {
-            ViewData["Title"] = "Lista de Cursos com '" + TextoAPesquisar + "'";
+            ViewData["Title"] = "Lista de Cursos com '" + textoAPesquisar + "'";
 
             var pesquisaVM = new PesquisaCursoViewModel();
+            pesquisaVM.TextoAPesquisar = textoAPesquisar;
 
-            if (string.IsNullOrWhiteSpace(TextoAPesquisar))
+            if (string.IsNullOrWhiteSpace(textoAPesquisar))
             {
                 pesquisaVM.ListaDeCursos = await _context.Cursos.Include("Categoria").ToListAsync();
             }
@@ -73,7 +74,7 @@ namespace PWEB_P6.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Search([Bind("TextoAPesquisar")]
+        public async Task<IActionResult> Search([Bind("textoAPesquisar")]
             PesquisaCursoViewModel pesquisaCurso)
         {
             ViewData["Title"] = "Lista de Cursos com '" + pesquisaCurso.TextoAPesquisar + "'";
