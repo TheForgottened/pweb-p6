@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,16 +16,22 @@ namespace PWEB_P6.Controllers
     public class AgendamentosController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AgendamentosController(ApplicationDbContext context)
+        public AgendamentosController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Agendamentos
+        [Authorize]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Agendamentos.Include(a => a.tipoDeAula);
+            var applicationDbContext = _context.Agendamentos
+                .Include(a => a.tipoDeAula)
+                .Include(a => a.ApplicationUser);
+
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -37,6 +45,7 @@ namespace PWEB_P6.Controllers
 
             var agendamento = await _context.Agendamentos
                 .Include(a => a.tipoDeAula)
+                .Include(a => a.ApplicationUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (agendamento == null)
             {
@@ -47,6 +56,7 @@ namespace PWEB_P6.Controllers
         }
 
         // GET: Agendamentos/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["TipoDeAulaId"] = new SelectList(_context.TipoDeAulas, "Id", "Id");
@@ -58,9 +68,14 @@ namespace PWEB_P6.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Cliente,DataInicio,DataFim,DuracaoEmHoras,DuracaoEmMinutos,Preco,DataHoraDoPedido,TipoDeAulaId")] Agendamento agendamento)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create([Bind("Id,DataInicio,DataFim,DuracaoEmHoras,DuracaoEmMinutos,Preco,DataHoraDoPedido,TipoDeAulaId")] Agendamento agendamento)
         {
             ModelState.Remove(nameof(agendamento.tipoDeAula));
+            ModelState.Remove(nameof(agendamento.ApplicationUser));
+            ModelState.Remove(nameof(agendamento.ApplicationUserId));
+
+            agendamento.ApplicationUserId = _userManager.GetUserId(User);
 
             if (ModelState.IsValid)
             {
@@ -73,6 +88,7 @@ namespace PWEB_P6.Controllers
         }
 
         // GET: Agendamentos/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Agendamentos == null)
@@ -94,7 +110,8 @@ namespace PWEB_P6.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Cliente,DataInicio,DataFim,DuracaoEmHoras,DuracaoEmMinutos,Preco,DataHoraDoPedido,TipoDeAulaId")] Agendamento agendamento)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,DataInicio,DataFim,DuracaoEmHoras,DuracaoEmMinutos,Preco,DataHoraDoPedido,TipoDeAulaId")] Agendamento agendamento)
         {
             if (id != agendamento.Id)
             {
@@ -126,6 +143,7 @@ namespace PWEB_P6.Controllers
         }
 
         // GET: Agendamentos/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Agendamentos == null)
@@ -147,6 +165,7 @@ namespace PWEB_P6.Controllers
         // POST: Agendamentos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Agendamentos == null)
@@ -173,7 +192,7 @@ namespace PWEB_P6.Controllers
 
         // POST: Agendamentos/Calcular
         [HttpPost]
-        public async Task<IActionResult> Calcular([Bind("Cliente,DataInicio,DataFim,TipoDeAulaId")] AgendamentoViewModel pedido)
+        public async Task<IActionResult> Calcular([Bind("DataInicio,DataFim,TipoDeAulaId")] AgendamentoViewModel pedido)
         {
             if (pedido.DataInicio > pedido.DataFim)
             {
@@ -195,11 +214,11 @@ namespace PWEB_P6.Controllers
             
             var agendamento = new Agendamento();
 
-            agendamento.Cliente = pedido.Cliente;
             agendamento.DataInicio = pedido.DataInicio;
             agendamento.DataFim = pedido.DataFim;
             agendamento.TipoDeAulaId = pedido.TipoDeAulaId;
             agendamento.tipoDeAula = tipoDeAula;
+            agendamento.ApplicationUserId = _userManager.GetUserId(User);
 
             agendamento.DuracaoEmHoras = (int) Math.Floor((agendamento.DataFim - agendamento.DataInicio).TotalHours);
             agendamento.DuracaoEmMinutos = (int)Math.Floor((agendamento.DataFim - agendamento.DataInicio).TotalMinutes);
@@ -207,6 +226,17 @@ namespace PWEB_P6.Controllers
             agendamento.DataHoraDoPedido = DateTime.Now;
 
             return View("PedidoConfirmacao", agendamento);
+        }
+
+        // GET: Agendamentos/OsMeusAgendamentos
+        public IActionResult OsMeusAgendamentos()
+        {
+            var listaAgendamentos = _context.Agendamentos
+                .Include(a => a.tipoDeAula)
+                .Include(a => a.ApplicationUser)
+                .Where(a => a.ApplicationUserId == _userManager.GetUserId(User));
+
+            return View(listaAgendamentos);
         }
 
         private bool AgendamentoExists(int id)

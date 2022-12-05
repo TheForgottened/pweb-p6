@@ -10,5 +10,8 @@ namespace PWEB_P6.Models
 
         [PersonalData]
         public int NIF { get; set; }
+
+        // Relation Agendamento
+        public ICollection<Agendamento> Agendamentos { get; set; }
     }
 }

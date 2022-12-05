@@ -59,6 +59,12 @@ namespace PWEB_P6.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            public string PrimeiroNome { get; set; }
+            public string UltimoNome { get; set; }
+            [DataType(DataType.DateTime)]
+            public DateTime DataNascimento { get; set; }
+            public int NIF { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -70,7 +76,11 @@ namespace PWEB_P6.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                PrimeiroNome = user.PrimeiroNome,
+                UltimoNome = user.UltimoNome,
+                DataNascimento = user.DataNascimento,
+                NIF = user.NIF
             };
         }
 
@@ -109,6 +119,17 @@ namespace PWEB_P6.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+            }
+
+            if (user.PrimeiroNome != Input.PrimeiroNome || user.UltimoNome != Input.UltimoNome ||
+                user.DataNascimento != Input.DataNascimento || user.NIF != Input.NIF)
+            {
+                user.PrimeiroNome = Input.PrimeiroNome;
+                user.UltimoNome = Input.UltimoNome;
+                user.DataNascimento = Input.DataNascimento;
+                user.NIF = Input.NIF;
+
+                await _userManager.UpdateAsync(user);
             }
 
             await _signInManager.RefreshSignInAsync(user);

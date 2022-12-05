@@ -98,6 +98,12 @@ namespace PWEB_P6.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            public string PrimeiroNome { get; set; }
+            public string UltimoNome { get; set; }
+            [DataType(DataType.DateTime)]
+            public DateTime DataNascimento { get; set; }
+            public int NIF { get; set; }
         }
 
 
@@ -117,6 +123,12 @@ namespace PWEB_P6.Areas.Identity.Pages.Account
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
+                user.PrimeiroNome = Input.PrimeiroNome;
+                user.UltimoNome = Input.UltimoNome;
+                user.DataNascimento = Input.DataNascimento;
+                user.NIF = Input.NIF;
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)

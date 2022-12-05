@@ -5,9 +5,6 @@ namespace PWEB_P6.ViewModels
 {
     public class AgendamentoViewModel
     {
-        [Display(Name = "Nome Cliente", Prompt = "Introduza o nome do cliente")]
-        public string Cliente { get; set; }
-
         [Display(Name = "Data de Início", Prompt = "yyyy-mm-dd")]
         public DateTime DataInicio { get; set; }
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PWEB_P6.Data;
 
@@ -11,9 +12,10 @@ using PWEB_P6.Data;
 namespace PWEB_P6.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221121184539_AddApplicationUser")]
+    partial class AddApplicationUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,9 +169,9 @@ namespace PWEB_P6.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("ApplicationUserId")
+                    b.Property<string>("Cliente")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DataFim")
                         .HasColumnType("datetime2");
@@ -193,8 +195,6 @@ namespace PWEB_P6.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("TipoDeAulaId");
 
@@ -422,19 +422,11 @@ namespace PWEB_P6.Data.Migrations
 
             modelBuilder.Entity("PWEB_P6.Models.Agendamento", b =>
                 {
-                    b.HasOne("PWEB_P6.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("Agendamentos")
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("PWEB_P6.Models.TipoDeAula", "tipoDeAula")
                         .WithMany("Agendamentos")
                         .HasForeignKey("TipoDeAulaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("ApplicationUser");
 
                     b.Navigation("tipoDeAula");
                 });
@@ -446,11 +438,6 @@ namespace PWEB_P6.Data.Migrations
                         .HasForeignKey("CategoriaId");
 
                     b.Navigation("Categoria");
-                });
-
-            modelBuilder.Entity("PWEB_P6.Models.ApplicationUser", b =>
-                {
-                    b.Navigation("Agendamentos");
                 });
 
             modelBuilder.Entity("PWEB_P6.Models.Categoria", b =>
