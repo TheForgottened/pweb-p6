@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using PWEB_P6.Models;
 
 namespace PWEB_P6.Areas.Identity.Pages.Account.Manage
@@ -65,6 +66,10 @@ namespace PWEB_P6.Areas.Identity.Pages.Account.Manage
             [DataType(DataType.DateTime)]
             public DateTime DataNascimento { get; set; }
             public int NIF { get; set; }
+
+            [Display(Name = "O meu Avatar")]
+            public byte[]? Avatar { get; set; }
+            public IFormFile AvatarFile { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -80,7 +85,8 @@ namespace PWEB_P6.Areas.Identity.Pages.Account.Manage
                 PrimeiroNome = user.PrimeiroNome,
                 UltimoNome = user.UltimoNome,
                 DataNascimento = user.DataNascimento,
-                NIF = user.NIF
+                NIF = user.NIF,
+                Avatar = user.Avatar
             };
         }
 
@@ -132,9 +138,39 @@ namespace PWEB_P6.Areas.Identity.Pages.Account.Manage
                 await _userManager.UpdateAsync(user);
             }
 
+            if (Input.AvatarFile != null)
+            {
+                if (Input.AvatarFile.Length > (200 * 1024))
+                {
+                    StatusMessage = "Error: Ficheiro demasiado grande";
+                    return RedirectToPage();
+                }
+                
+                if (!IsValidFileType(Input.AvatarFile.FileName))
+                {
+                    StatusMessage = "Error: Ficheiro não suportado";
+                    return RedirectToPage();
+                }
+
+                using (var dataStream = new MemoryStream())
+                {
+                    await Input.AvatarFile.CopyToAsync(dataStream);
+                    user.Avatar = dataStream.ToArray();
+                }
+
+                await _userManager.UpdateAsync(user);
+            }
+
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();
+        }
+
+        public bool IsValidFileType(string fileName) // .jpg, .png, .jpeg
+        {
+            var valid_extensions = new [] { ".jpg", ".png", ".jpeg" };
+            var ext = Path.GetExtension(fileName);
+            return valid_extensions.Contains(ext);
         }
     }
 }
