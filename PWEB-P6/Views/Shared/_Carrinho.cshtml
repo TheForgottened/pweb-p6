@@ -1,0 +1,14 @@
+﻿@using PWEB_P6.Helpers
+@{
+    var carrinhoDeCompras = Context.Session.GetJson<Carrinho>("CarrinhoDeCompras") ??
+                            new Carrinho();
+    var qtd = carrinhoDeCompras == null ? 0 : carrinhoDeCompras.TotalItems();
+}
+<div class="form-inline d-flex ">
+    <span class="badge badge-dark fs-6 ">@qtd</span>
+    <strong>
+        <svg bootstrap-icon="Cart"
+             class="text-white me-2" width="24" height="24"
+             aria-label="Search"></svg>
+    </strong>
+</div>

@@ -92,6 +92,21 @@ namespace PWEB_P6.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnGetAsync()
         {
+            var cookieOptions = new CookieOptions
+            {
+                Expires = DateTime.Now.AddDays(10),
+                Path = "/"
+            };
+
+            var cookie = Request.Cookies["PWEB_BgColor"];
+            cookie ??= "yellow";
+
+            // adiciona / modifica o cookie com o nome PWEB_BgColor
+            Response.Cookies.Append("PWEB_BgColor", cookie, cookieOptions);
+
+            // elimina o cookie com o nome PWEB_BgColor
+            // Response.Cookies.Delete("PWEB_BgColor");
+
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {

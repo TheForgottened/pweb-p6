@@ -76,6 +76,7 @@
                         <h1 class="card-title pricing-card-title">€ @curso.Preco.GetValueOrDefault()<small class="text-muted fw-light"></small></h1>
                         @curso.DescricaoResumida
                         <a asp-controller="Cursos" asp-action="Details" asp-route-id="@curso.Id" class="w-100 btn btn-lg btn-outline-primary">Saber mais</a>
+                        <a asp-controller="Cursos" asp-action="Comprar" asp-route-id="@curso.Id" class="w-100 btn btn-lg btn-success">Comprar</a>
                     </div>
                 </div>
             </div>
